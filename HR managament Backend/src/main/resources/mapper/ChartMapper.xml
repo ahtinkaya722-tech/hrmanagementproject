@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.Mapper.ChartMapper">
+
+    <select id="getChartData" resultType="com.example.demo.Model.ChartDTO">
+        SELECT
+            d.name AS name,
+            COUNT(e.id) AS value
+        FROM employee e
+        JOIN department d ON e.department_id = d.id
+        GROUP BY d.name
+    </select>
+
+    <select id="getAnnouncementLists" resultType="com.example.demo.Model.AnnoucementList">
+                select * from announcements
+              
+    </select>
+
+
+</mapper>

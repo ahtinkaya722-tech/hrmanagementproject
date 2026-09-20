@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.Mapper.PayrollMapper">
+ <select id="getPayrollData" resultType="com.example.demo.Model.PayrollDTO">
+    SELECT
+    p.month,
+    p.year AS year,
+    COUNT(p.employee_id) AS totalEmployees,
+    SUM(p.gross_salary) AS totalGross,
+
+    SUM(
+        COALESCE(pd.tax,0) +
+        COALESCE(pd.insurance,0) +
+        COALESCE(pd.leave_deduction,0) +
+        COALESCE(pd.late_deduction,0) +
+        COALESCE(pd.other_deduction,0)
+    ) AS totalDeduction,
+
+    SUM(
+        p.gross_salary -
+        (
+            COALESCE(pd.tax,0) +
+            COALESCE(pd.insurance,0) +
+            COALESCE(pd.leave_deduction,0) +
+            COALESCE(pd.late_deduction,0) +
+            COALESCE(pd.other_deduction,0)
+        )
+    ) AS totalNetSalary,
+
+    SUM(
+        CASE 
+            WHEN p.status = 'PENDING' 
+            OR p.status = 'DRAFT' 
+            THEN 1 
+            ELSE 0 
+        END
+    ) AS pending
+
+FROM payroll p
+LEFT JOIN payroll_deduction pd 
+    ON p.id = pd.payroll_id
+
+GROUP BY p.month, p.year;
+    </select>
+ <select id="getPayrollTableData" resultType="com.example.demo.Model.PayrollTableDTO">
+  SELECT
+    p.id,pd.id as deduction_id,
+    e.name AS employeeName,
+    d.name AS departmentName,
+    ep.title AS positionName,
+    p.gross_salary AS grossSalary,
+  (   coalesce(pd.tax,0)+
+     coalesce(pd.insurance,0)+
+      coalesce(pd.leave_deduction,0)+
+       coalesce(pd.late_deduction,0)+
+        coalesce(pd.other_deduction,0)) as deductionAmount
+    ,
+     (  p.gross_salary  - (coalesce(pd.tax,0)+
+     coalesce(pd.insurance,0)+
+      coalesce(pd.leave_deduction,0)+
+       coalesce(pd.late_deduction,0)+
+        coalesce(pd.other_deduction,0))) as  netSalary,
+            pd.tax,
+            pd.insurance,
+            pd.late_deduction as lateDeduction,
+            pd.leave_deduction as leaveDeduction,
+            pd.other_deduction as otherDeductions,
+    p.month,
+    p.year as year,
+    p.status,
+    p.payment_date AS paymentDate
+
+FROM payroll p
+JOIN employee e ON p.employee_id = e.id
+JOIN department d ON e.department_id = d.id
+JOIN e_position ep ON e.position_id = ep.id
+LEFT JOIN payroll_deduction pd ON p.id = pd.payroll_id;
+
+        
+  </select>
+   
+   <select id="checkData" resultType="boolean">
+       SELECT COALESCE(
+        EXISTS(
+            SELECT 1
+            FROM payroll
+            WHERE month = #{month}
+            AND year = #{year}
+        ),
+        false
+    )
+</select>
+ <select id="getPayrollMissingData" resultType="com.example.demo.Model.Employee">
+      SELECT *
+FROM employee e
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM payroll p
+    WHERE p.employee_id = e.id
+    AND p.month = #{month}
+    AND p.year = #{year}
+);
+</select>
+
+
+
+
+  <update id="updatePayrollData" parameterType="com.example.demo.Model.PayrollTableDTO">
+    UPDATE payroll
+    SET
+        gross_salary = #{grossSalary},
+        status = #{status},
+        payment_date = #{paymentDate},
+        month = #{month}
+    WHERE id = #{id}
+</update>
+
+<update id="updatePayrollDeduction"  parameterType="com.example.demo.Model.PayrollTableDTO">
+    UPDATE payroll_deduction
+    SET
+        tax = #{tax},
+        insurance = #{insurance},
+        leave_deduction = #{leaveDeduction},
+        late_deduction = #{lateDeduction},
+        other_deduction = #{otherDeductions}
+    WHERE payroll_id = #{id}
+</update>
+
+    <insert id="insertPayrollDeductionId" >
+   
+    
+    INSERT INTO payroll_deduction (
+        payroll_id,
+        tax,
+        insurance,
+        late_deduction,
+        leave_deduction,
+        other_deduction
+    )
+    VALUES (
+        #{id},
+        0,
+        0,
+        0,
+        0,
+        0
+    )
+</insert>
+    
+   
+    <insert id="insertMissingData">
+    INSERT INTO payroll (
+        employee_id,
+        month,
+        year,
+        status
+    )
+    VALUES (
+        #{employeeId},
+        #{month},
+        #{year},
+        "draft"
+    )
+</insert>
+
+     <select id="getPayrollId" resultType="integer">
+      SELECT id
+    FROM payroll
+    WHERE employee_id = #{employeeId}
+    AND month = #{month}
+    AND year = #{year}
+</select>
+
+
+   
+
+
+<delete id="deletePayrollData">
+    DELETE FROM payroll
+    WHERE id = #{id}
+</delete>
+
+<delete id="deletePayrollDeductionData">
+    DELETE FROM payroll_deduction
+    WHERE payroll_id = #{id}
+</delete>
+
+
+
+</mapper>

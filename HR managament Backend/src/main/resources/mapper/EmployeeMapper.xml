@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.Mapper.EmployeeMapper">
+
+
+    <select id="findByUsername"
+            parameterType="string"
+            resultType="com.example.demo.Model.Employee">
+
+        SELECT
+            id,
+             employee_id as employeeId,
+            username,
+            password,
+            role
+        FROM `user`
+        WHERE username = #{username}
+
+    </select>
+          <select id="existsUsername"
+        parameterType="string"
+        resultType="com.example.demo.Model.Employee">
+
+    SELECT username 
+    FROM user
+        WHERE username = #{username}
+
+</select>
+
+        <select id="findByEmployeeId"
+            parameterType="int"
+            resultType="com.example.demo.Model.Employee">
+
+        SELECT
+            id,
+            employee_id,
+            username,
+            password,
+            role
+        FROM `user`
+        WHERE employee_id = #{employeeId}
+
+    </select>
+        <select id="findAllEmployees" resultType="com.example.demo.Model.Employee">
+        SELECT 
+    e.id,
+    e.name,
+    e.email,
+    e.phone,
+    e.department_id AS departmentId,
+    e.position_id AS positionId,
+    d.name AS departmentName,
+    p.title AS positionTitle,
+    e.status
+FROM employee e
+LEFT JOIN department d ON e.department_id = d.id
+LEFT JOIN e_position p ON e.position_id = p.id;
+    </select>
+ <select id="getPositions" resultType="com.example.demo.Model.Position">
+        SELECT id, title FROM e_position
+    </select>
+     <select id="getDepartments" resultType="com.example.demo.Model.Department">
+        SELECT * FROM department
+    </select>
+        <select id="findAllDepartment" resultType="com.example.demo.Model.Employee">
+        SELECT * FROM employee
+    </select>
+    <select id="findAll" resultType="com.example.demo.Model.Employee">
+        SELECT * FROM employee
+    </select>
+
+    <select id="findById" resultType="com.example.demo.Model.Employee">
+        SELECT * FROM employee WHERE id = #{id}
+    </select>
+<select id="getEmployeesForPosition" resultType="com.example.demo.Model.Employee">
+ SELECT
+    e.id,
+    e.name,
+    e.email,
+	coalesce( u.username,"Not Set")as acc,
+    coalesce(d.name,"Not Set")as role
+FROM employee e join department d on e.department_id = d.id
+left JOIN user u
+     ON e.id = u.employee_id;
+</select>
+
+
+      
+
+      
+<select id="membersForTask" resultType="com.example.demo.Model.MemberTask">
+    SELECT
+    u.id,
+    e.id,
+    e.name,
+    u.role
+FROM employee e
+JOIN user u
+    ON e.id = u.employee_id;
+</select>
+     
+<select id="allmemberTasks" resultType="com.example.demo.Model.Task">
+  select ut.id as taskId,ut.user_id as userId,ut.description as Description,ut.report_type,ut. dueDate as DueDate ,ut.timeRange as TimeRange from userTask ut join user u where u.id = ut.user_id;
+</select>
+      
+
+      <delete id="deleteEmployeeByIds">
+        DELETE FROM employee
+        WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <insert id="insert">
+        INSERT INTO employee(name, email, phone, department_id, position_id, status)
+        VALUES (#{name}, #{email}, #{phone}, #{departmentId}, #{positionId}, #{status})
+    </insert>
+
+    <insert id="insertAccount">
+        insert into user(username,password,role,employee_id)values (#{username}, #{password}, #{role}, #{employeeId})
+
+    </insert>
+
+  <update id="update" parameterType="com.example.demo.Model.Employee">
+    UPDATE employee
+    SET
+        name = #{name},
+        email = #{email},
+        phone = #{phone},
+        department_id = #{departmentId},
+        position_id = #{positionId},
+        status = #{status}
+    WHERE id = #{id}
+</update>
+
+    <delete id="delete">
+        DELETE FROM employee WHERE id=#{id}
+    </delete>
+</mapper>

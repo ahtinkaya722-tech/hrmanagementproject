@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.Mapper.LeaveMapper">
+
+    <select id="findAllLeaveTypes" resultType="com.example.demo.Model.Leave_TypeModel">
+           SELECT id, name AS leaveTypeName, total_days AS totalDays
+        FROM leave_type;
+    </select>
+     <select id="findLeaveRequestByEmployeeId" resultType="com.example.demo.Model.LeaveRequest">
+
+         select  lr.start_date,lr.end_date,lr.reason,lr.status,d.name as department_Name,li.image as images from leave_request lr join employee e on e.id = lr.employee_id join department d on d.id= e.department_id left join leave_image li on li.leave_request_id= lr.id  where employee_id=#{id}
+    </select>       
+ <select id="findAllLeaveRequest" resultType="com.example.demo.Model.LeaveRequest">
+
+     select  lr.id as leaveRequestId,lt.name as leaveType,lr.start_date,lr.end_date,lr.reason,lr.status,d.name as departmentName,e.name as employeeName,li.image as images from leave_request lr join employee e on e.id = lr.employee_id join department d on d.id= e.department_id join leave_type lt on lt.id= lr.leave_type_id left join leave_image li on li.leave_request_id= lr.id 
+    </select>
+
+        <select id="getLeaveBalance" resultType="com.example.demo.Model.LeaveBalance">
+         select lt.total_days as totalAvailableDay,coalesce(sum(datediff(lr.end_date,lr.start_date)+1),0) as usedLeave,
+            (lt.total_days - coalesce(sum(datediff(lr.end_date,lr.start_date)+1),0)) as remainingDay
+        from leave_type lt left join leave_request lr on lr.leave_type_id = lt.id and lr.status="APPROVED" and lr.employee_id=#{employeeId}  where  lt.name = "casual leave" group by lt.id;
+        </select> 
+
+            <update id="ApproveLeaveRequest">
+                update leave_request set status = "APPROVED" where id = #{leaveRequestId}
+            </update>
+
+
+    <insert id="insertLeaveRequest">
+       insert into leave_request(employee_id,leave_type_id,start_date,end_date,reason)values(#{employeeId},#{leaveTypeId},#{startDate},#{endDate},#{reason}); 
+
+    </insert>
+    <insert id="insertLeaveImage">
+
+    INSERT INTO leave_image
+    (
+        leave_request_id,
+        image
+    )
+    VALUES
+    (
+        #{leaveRequestId},
+        #{images}
+    )
+
+</insert>
+</mapper>

@@ -1,0 +1,22 @@
+# RAR / ZIP
+*.rar
+*.zip
+
+# React
+node_modules/
+dist/
+
+# Spring Boot
+target/
+
+# Environment / secrets
+.env
+*.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
