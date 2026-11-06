@@ -1,3 +1,4 @@
+
 import {
   HomeIcon,
   UsersIcon,
@@ -9,12 +10,18 @@ import {
   DocumentChartBarIcon,
   Cog6ToothIcon,
   ArrowLeftStartOnRectangleIcon,
+  ClipboardDocumentListIcon,
+  MegaphoneIcon,
+  AcademicCapIcon,
+  BookOpenIcon,
+  UserGroupIcon,
+  ClipboardDocumentCheckIcon,
+
 } from "@heroicons/react/24/outline";
 
 import Swal from "sweetalert2";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { ClipboardDocumentListIcon ,MegaphoneIcon} from "@heroicons/react/24/outline";
 
 import { useEffect } from "react";
 
@@ -24,6 +31,12 @@ const menus = [
     path: "/dashboard",
     icon: HomeIcon,
   },
+  {
+    name:"Attendance",
+    path:"/attendance",
+    icon: ClockIcon,
+  }
+  ,
   {
     name: "Employees",
     path: "/employees",
@@ -67,15 +80,59 @@ const menus = [
  
 ];
 
+const schoolMenus = [
+  { name: "Dashboard", path: "/school/dashboard", icon: HomeIcon },
+  { name: "Students", path: "/school/students", icon: UsersIcon },
+  { name: "Teachers", path: "/school/teachers", icon: AcademicCapIcon },
+  { name: "Classes", path: "/school/classes", icon: BuildingOfficeIcon },
+  { name: "Subjects", path: "/school/subjects", icon: BookOpenIcon },
+  { name: "Attendance", path: "/school/attendance", icon: ClipboardDocumentCheckIcon },
+  { name: "Parents", path: "/school/parents", icon: UserGroupIcon },
+  { name: "Announcements", path: "/school/announcements", icon: MegaphoneIcon },
+  { name: "Reports", path: "/school/reports", icon: DocumentChartBarIcon },
+  { name: "Settings", path: "/school/settings", icon: Cog6ToothIcon },
+];
 
 
-const Sidebar = () => {
+
+const Sidebar = ({ sideBarMode }) => {
 
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role?.toLowerCase() === "hr" 
+   const isSchool = sideBarMode;
+   const theme = isSchool
+    ? {
+        sidebar: "bg-[#1b9729]",
+        hover: "hover:bg-[#147520]",
+        active: "bg-[#147520]",
+        border: "border-[#126d1d]",
+        text: "text-white",
+        inactive: "text-green-100",
+        logout: "hover:bg-red-600",
+      }
+    : {
+        sidebar: "bg-slate-900",
+        hover: "hover:bg-slate-800",
+        active: "bg-slate-700",
+        border: "border-slate-700",
+        text: "text-white",
+        inactive: "text-slate-400",
+        logout: "hover:bg-red-600",
+      };
 
-const sidebarmenus = [
+
+const sidebarmenus =  sideBarMode? [...schoolMenus,... (isAdmin?[{
+      name: "Request Leaves",
+    path: "/request_leave",
+    icon: ClipboardDocumentListIcon,
+
+},{
+     name: "Announcements",
+    path: "/Announcements",
+    icon: MegaphoneIcon,
+
+}]:[])] :  [
 ...menus,...(isAdmin?[{
       name: "Request Leaves",
     path: "/request_leave",
@@ -110,22 +167,17 @@ const sidebarmenus = [
     }
   };
 
-  // Phone menus
-  const mobileMenus = [
-    menus[0], // Dashboard
-    menus[1], // Employees
-    menus[4], // Task
-    menus[5], // Leave
-    menus[7], // Reports
-  ];
+
 
   return (
+  
+
     <>
       {/* =========================================
           DESKTOP SIDEBAR
       ========================================= */}
       <aside
-        className="
+        className={`
           hidden
           md:block
           fixed
@@ -134,19 +186,20 @@ const sidebarmenus = [
           z-50
           w-64
           min-h-screen
-          bg-slate-900
+          ${theme.sidebar}
+     
           text-white
           font-bold
-        "
+        `}
       >
         {/* Logo / Title */}
         <div className="text-center pt-5">
-          <h1 className="text-3xl">Sidebar</h1>
+          <h1 className="text-3xl  font-medium">JST</h1>
         </div>
 
         {/* Menu */}
         <nav className="mt-4">
-          {sidebarmenus.map((m) => {
+          {   sidebarmenus.map((m,index) => {
             const Icon = m.icon;
 
             return (
@@ -154,6 +207,7 @@ const sidebarmenus = [
                 key={m.name}
                 to={m.path}
                 onClick={() => setSelected(m.name)}
+                style={{ animationDelay: `${index * 100}ms` }}
                 className={`
                   flex
                   items-center
@@ -162,6 +216,7 @@ const sidebarmenus = [
                   gap-3
                   cursor-pointer
                   hover:bg-slate-800
+                  fade-slide-in
                   transition
                   duration-200
                   ${selected === m.name ? "font-bold bg-slate-700" : ""}
@@ -203,7 +258,7 @@ const sidebarmenus = [
           MOBILE BOTTOM NAVIGATION
       ========================================= */}
       <aside
-        className="
+        className={`
           md:hidden
           fixed
           bottom-0
@@ -211,11 +266,11 @@ const sidebarmenus = [
           z-50
           w-full
           h-16
-          bg-slate-900
+         ${theme.sidebar}
           text-white
           border-t
           border-slate-700
-        "
+        `}
       >
         <nav className="flex items-center justify-around h-full">
           {sidebarmenus.map((m) => {
@@ -238,10 +293,11 @@ const sidebarmenus = [
                   text-[10px]
                   transition
                   duration-200
+                  fade-slide-in 
                   ${
                     selected === m.name
                       ? "text-white bg-slate-700"
-                      : "text-slate-400 hover:text-white"
+                      : "text-white hover:text-white hover:bg-slate-800"
                   }
                 `}
               >
@@ -253,27 +309,16 @@ const sidebarmenus = [
           })}
 
           {/* Mobile Logout */}
-          <button
+            <button
             onClick={logout}
-            className="
-              flex
-              flex-col
-              items-center
-              justify-center
-              gap-0.5
-              h-full
-              min-w-[55px]
-              px-1
-              text-[10px]
-              text-slate-400
-              hover:text-white
-              hover:bg-red-600
-              transition
-              duration-200
-            "
+            className={`
+              flex flex-col items-center justify-center
+              gap-0.5 h-full min-w-[55px] px-1
+              text-[10px] ${theme.inactive}
+              ${theme.logout}
+            `}
           >
             <ArrowLeftStartOnRectangleIcon className="w-5 h-5" />
-
             <span>Logout</span>
           </button>
         </nav>

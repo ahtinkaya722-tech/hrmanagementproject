@@ -13,6 +13,9 @@ import Leave from "../pages/Leave";
 import RequestLeave from "../pages/RequestLeave";
 import AddAnnouncements from "../pages/AddAnnouncements";
 import LeaveBalance from "../pages/LeaveBalance";
+import Attendance from "../pages/Attendance";
+import Students from "../components/Students";
+import SchoolDashBoard from "../school_Management_Component/schoolDashBoard";
 
 
 const AppRoutes = ({ employees }) => {
@@ -23,6 +26,7 @@ const AppRoutes = ({ employees }) => {
 
       
       <Route path="/dashboard" element={<Dashboard employees={employees} />} />
+      <Route path="/school/dashboard" element={<SchoolDashBoard />} />
       <Route path="/employees" element={<Employees />} />
       <Route path="/payroll" element={<Payroll />} />
       <Route path="/position" element={<Position/>}/>
@@ -30,6 +34,7 @@ const AppRoutes = ({ employees }) => {
       <Route path="/setting" element={<Setting/>}/>
       <Route path="/task" element={<Task/>}/>
        <Route path="/leave" element={<Leave/>} />
+       <Route path="/attendance" element={<Attendance/>} />
        <Route path="/request_leave" element={<RequestLeave/>} />
         <Route path="/Announcements" element={<AddAnnouncements/>} />
       <Route path="/departments" element={<Department />}>

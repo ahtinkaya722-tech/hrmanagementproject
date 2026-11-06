@@ -92,6 +92,7 @@ const Setting = () => {
         type: 'success',
         message: 'Profile settings saved successfully!'
       });
+     
 
     } catch (error) {
       console.error("Update failed:", error);

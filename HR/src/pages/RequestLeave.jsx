@@ -114,9 +114,7 @@ const RequestLeave = () => {
     return <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />;
   };
 
-  // =========================
-  // FILTERING LOGIC
-  // =========================
+
   const filteredRequests = leaveRequest.filter((request) => {
     const matchesStatus =
       statusFilter === "ALL" || request.status === statusFilter;
@@ -130,9 +128,7 @@ const RequestLeave = () => {
     return matchesStatus && matchesSearch;
   });
 
-  // =========================
-  // FORMAT DATE
-  // =========================
+
   const formatDate = (date) => {
     if (!date) return "-";
     return new Date(date).toLocaleDateString("en-US", {
@@ -156,6 +152,22 @@ const RequestLeave = () => {
     setSelectedRequest(request);
   };
 
+  const rejectRequest = async (id) => {
+
+      const res = await axios.patch("http://localhost:8080/api3/reject", {},{
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+          },
+          params: {
+            leaveRequestId: id,
+          },
+        });
+        console.log(res.data);
+        
+        fetchLeaveRequestData();
+
+
+  }
   const getImageSrc = (base64String) => {
     if (!base64String) return null;
     if (Array.isArray(base64String)) {
@@ -359,6 +371,7 @@ const RequestLeave = () => {
                       <h2 className="text-xl font-bold text-slate-900">
                         {selectedRequest.employeeName}
                       </h2>
+                     
                       <p className="text-xs font-semibold text-slate-500 flex items-center gap-1.5 mt-1">
                         <Building2 className="w-3.5 h-3.5 text-slate-400" />
                         {selectedRequest.departmentName || "No Department"}
@@ -466,11 +479,11 @@ const RequestLeave = () => {
               {/* Action Buttons */}
               {selectedRequest.status === "PENDING" && (
                 <div className="p-6 border-t border-slate-100 flex items-center justify-end gap-3 bg-white">
-                  <button
+                  <button onClick={()=>rejectRequest(selectedRequest.leaveRequestId)}
                     type="button"
                     className="px-5 py-2.5 rounded-xl border border-rose-200 text-rose-600 bg-rose-50/50 hover:bg-rose-100 text-sm font-semibold transition-all inline-flex items-center gap-1.5"
                   >
-                    <X className="w-4 h-4" /> Reject
+                    <X className="w-4 h-4" /> Reject  {selectedRequest.leaveRequestId} 
                   </button>
 
                   <button

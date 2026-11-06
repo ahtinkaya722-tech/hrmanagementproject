@@ -7,13 +7,14 @@ import Sidebar from "../components/Sidebar";
 const MainLayout = ({ children }) => {
   const [showAnnouncement, setShowAnnouncement] = useState(true);
 
+  const [sideBarMode,setSideBarMode]=useState(()=>   {return localStorage.getItem("sideBarMode") === "school" ? true : false });
   useEffect(() => {
     const handleScroll = () => {
-      // If scrolled down more than 50px, hide the announcement
+
       if (window.scrollY > 50) {
         setShowAnnouncement(false);
       } else {
-        // Show it again when back at the top
+     
         setShowAnnouncement(true);
       }
     };
@@ -28,11 +29,11 @@ const MainLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Fixed Navbar */}
-      <Navbar />
+      <Navbar setSideBarMode={setSideBarMode} sideBarMode= {sideBarMode}/>
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        <Sidebar />
+        <Sidebar sideBarMode={sideBarMode} />
 
         {/* Main Content Area */}
         <main
@@ -71,7 +72,7 @@ const MainLayout = ({ children }) => {
           </div>
 
           {/* Page Body Content */}
-          <div className="px-4 sm:px-6 md:px-8">
+          <div className="px-4 py-5 sm:px-6 md:px-8 md:py-10">
             {children}
           </div>
         </main>

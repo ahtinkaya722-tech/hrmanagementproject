@@ -66,14 +66,14 @@ import { LogIn } from 'lucide-react';
         cancelButtonText: "Cancel"
     });
 
-    // Stop if user clicks Cancel
+ 
     if (!result.isConfirmed) {
         return;
     }
 
     try {
 
-        // Delete task
+       
         const res = await axios.delete(
             `http://localhost:8080/api3/deleteTasks/${task.taskId}`,
             {

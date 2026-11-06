@@ -11,20 +11,15 @@ const Login = ({setToken}) => {
         password:""
     });
  const login = async () => {
-    console.log("🔥 LOGIN FUNCTION CALLED");
+ 
 
     try {
-        console.log("🔥 EMAIL =", formData.email);
-
+        
         const res = await axios.post(
             "http://localhost:8080/api/auth/login",
             formData
         );
 
-        console.log("🔥 RESPONSE =", res.data);
-
-          
-            
               if(res.data !=null){
 
                const result=  await Swal.fire({

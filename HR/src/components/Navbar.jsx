@@ -1,28 +1,56 @@
 import React, { useEffect } from "react";
 import Sidebar from "./Sidebar";
 import { User } from "lucide-react";
-
-const Navbar = () => {
+import { RefreshCw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+const Navbar = ({sideBarMode,setSideBarMode}) => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
-
- 
+  const navigate = useNavigate();
+  
   const imageSrc = user?.image
     ? user.image.startsWith("data:image")
       ? user.image
       : `data:image/jpeg;base64,${user.image}`
     : null;
 
+    const handleSwtich = (sideBarMode) => {
+      const newMode = !sideBarMode;
+      setSideBarMode(newMode);
+      localStorage.setItem("sideBarMode",  newMode ? "school" : "hr");
+      if(newMode){
+        navigate("/school/dashboard");
+      }else{
+      navigate("/dashboard");
+      }
+    };
+
   return (
+
+   
     <header className="sticky top-0 z-30 h-16 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm px-4 sm:px-6">
       
       <div className="h-full grid grid-cols-[auto_1fr] items-center gap-4">
         
    
         <div className="grid grid-flow-col items-center gap-3 auto-cols-max">
-          <div className="w-2.5 h-6 bg-blue-600 rounded-full" />
+          <div className= {`w-2.5 h-6  rounded-full ${sideBarMode ? "bg":""}`} />
+         
+         
           <h2 className="text-base sm:text-lg font-bold tracking-tight text-gray-900 whitespace-nowrap">
-            HR Management
+             {sideBarMode ? ( <>School Management</> ):(<> HR Management</> )  }   
           </h2>
+          <button
+  type="button"
+  onClick={() => handleSwtich(sideBarMode)}
+  title="Switch Management System"
+  className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 border border-gray-200 transition-all duration-300"
+>
+ <RefreshCw
+  className={`w-4 h-4 transition-transform duration-500 ${
+    sideBarMode ? "rotate-180" : "rotate-0"
+  }`}
+/>
+</button>
         </div>
 
       

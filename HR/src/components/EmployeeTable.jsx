@@ -237,9 +237,7 @@ const EmployeeTable = () => {
     }
   };
 
-  // =========================
-  // Add Employee
-  // =========================
+
   const handleSave = async () => {
     const isConfirmed = window.confirm(
       "Are you sure you want to add this new employee?"
